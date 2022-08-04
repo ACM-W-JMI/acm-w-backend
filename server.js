@@ -11,21 +11,9 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-// const uri = process.env.ATLAS_URI;
-
-// mongoose.connect(uri, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// });
-
-// const connection = mongoose.connection;
-// connection.once("open", () => {
-//   console.log("mongodb database established successfully!");
-// });
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL,
     pass: process.env.PASSWORD,
@@ -41,32 +29,28 @@ transporter.verify(function (error, success) {
   }
 });
 
-app.post("/contact", (req, res, next) => {
-  var name = req.body.name;
-  var email = req.body.email;
-  var subject = req.body.subject;
-  var message = req.body.message;
 
-  var mail = {
+app.post("/contact", (req, res) => {
+  const name = req.body.name;
+  const email = req.body.email;
+  const message = req.body.message; 
+  const mail = {
     from: name,
-    // receiver email,
-    // to:
-    subject: subject,
-    text: message,
+    to: process.env.EMAIL,
+    subject: "Contact Form Submission",
+    html: `<p>Name: ${name}</p>
+           <p>Email: ${email}</p>
+           <p>Message: ${message}</p>`,
   };
-
-  transporter.sendMail(mail, (err, data) => {
-    if (err) {
-      res.json({
-        status: "fail",
-      });
+  transporter.sendMail(mail, (error) => {
+    if (error) {
+      res.json({ status: "ERROR" });
     } else {
-      res.json({
-        status: "success",
-      });
+      res.json({ status: "Message Sent" });
     }
   });
 });
+
 
 app.listen(port, () => {
   console.log("Server Running!");
