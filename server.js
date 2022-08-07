@@ -37,7 +37,7 @@ app.post("/contact", (req, res) => {
   const mail = {
     from: name,
     to: process.env.EMAIL,
-    subject: "Contact Form Submission",
+    subject: "ACM W JMI Contact Form",
     html: `<p>Name: ${name}</p>
            <p>Email: ${email}</p>
            <p>Message: ${message}</p>`,
